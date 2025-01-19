@@ -21,18 +21,33 @@ namespace h26x {
         [[nodiscard]] size_t available() const override;
         [[nodiscard]] size_t position() const override;
         size_t skip(size_t s) override;
+        void set(bool v);
+        template<typename T>
+        void set(T v, uint8_t bits);
+        /**
+         * Set the trailing bits to true or false
+         * @param v
+         */
+        void setTrailingBits(bool v);
+        /**
+         * Flush any remaining bits to the ByteSteam
+         */
+        void flush();
 
-    protected:
-        virtual void advanceBuffer();
+    private:
+        void advanceBuffer();
         [[nodiscard]] bool available(uint8_t bits) const;
 
+        bool setWork();
+        ByteStream * mByteStream;
+
+        bool mWrite {false};
         bool mOk {true};
         uint8_t mWork {0};
         uint8_t mBitsRemaining;
 
-    private:
-        bool setWork();
-        ByteStream * mByteStream;
+        static int SINGLE_MASKS[9];
+        static int ALL_MASKS[9];
     };
 
 } // h26x

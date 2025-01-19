@@ -15,6 +15,7 @@ namespace h26x {
         [[nodiscard]] size_t available() const override;
         [[nodiscard]] size_t position() const override;
         bool read(uint8_t *byte) const override;
+        bool write(uint8_t byte) override;
     protected:
         // These need to be 1, not 0
         uint8_t mPrior1 {1};

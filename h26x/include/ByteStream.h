@@ -12,6 +12,12 @@ namespace h26x {
     class ByteStream: public Stream {
     public:
         virtual bool read(uint8_t *byte) const = 0;
+        /**
+         * Write the current byte.  Does not advance position()
+         * @param byte by value
+         * @return true if a byte was written (not at end of buffer)
+         */
+        virtual bool write(uint8_t byte) = 0;
     };
 
 } // h26x

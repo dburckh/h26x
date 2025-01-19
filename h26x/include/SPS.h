@@ -31,7 +31,7 @@ namespace h26x {
         public:
             ProfileIdcInfoExt() = default;
             bool read(BitStream *br);
-            void write(RWBitStream *bitWriter) const override;
+            void write(BitStream *bitWriter) const override;
             /**
              * Only for chromaFormatIdc == CHROMA_FORMAT_IDC_444
              */
@@ -47,7 +47,7 @@ namespace h26x {
         class PicOrderCountType:Writable {
         public:
             explicit PicOrderCountType(uint8_t type);
-            void write(RWBitStream *bitWriter) const override;
+            void write(BitStream *bitWriter) const override;
             const uint8_t type;
             virtual ~PicOrderCountType() = default;
         };
@@ -55,7 +55,7 @@ namespace h26x {
         class PicOrderCountType0:public PicOrderCountType {
         public:
             explicit PicOrderCountType0(BitStream *bitstream);
-            void write(RWBitStream *bitWriter) const override;
+            void write(BitStream *bitWriter) const override;
             /**
              * [0-12]
              */
@@ -65,7 +65,7 @@ namespace h26x {
         class PicOrderCountType1:public PicOrderCountType {
         public:
             explicit PicOrderCountType1(BitStream *bitstream);
-            void write(RWBitStream *bitWriter) const override;
+            void write(BitStream *bitWriter) const override;
             bool deltaPicOrderAlwaysZeroFlag;
             int32_t offsetForNonRefPic;
             int32_t offsetForTopToBottomField;
@@ -76,7 +76,7 @@ namespace h26x {
         class FrameCropOffset:public Writable {
         public:
             explicit FrameCropOffset(BitStream *bitstream);
-            void write(RWBitStream *bitWriter) const override;
+            void write(BitStream *bitWriter) const override;
             uint32_t left;
             uint32_t right;
             uint32_t top;
@@ -84,7 +84,7 @@ namespace h26x {
         };
 
         bool read(BitStream * br);
-        void write(RWBitStream *bitWriter) const override;
+        void write(BitStream *bitWriter) const override;
 
         [[nodiscard]] PicOrderCountType0 * getPicOrderCountType0() const;
         [[nodiscard]] PicOrderCountType1 * getPicOrderCountType1() const;

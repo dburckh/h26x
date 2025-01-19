@@ -3,12 +3,9 @@
 //
 #include <gtest/gtest.h>
 #include "../include/ByteStream.h"
-#include "../include/RWBufferStream.h"
-#include "../include/RWNalByteStream.h"
 #include "../include/BitStream.h"
 #include "../include/SPS.h"
 #include "Common.h"
-#include "RWBufferStream.h"
 #include "NalByteStream.h"
 
 using namespace h26x;
@@ -70,8 +67,8 @@ TEST(spsTest, readSps)
     EXPECT_EQ(1, sps.vuiParameters->bitstreamRestriction->maxDecFrameBuffering);
 
     std::vector<uint8_t> buffer(sizeof(data));
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream bw(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream bw(&rwbs);
 
     sps.write(&bw);
     EXPECT_EQ(br.position(), bw.position());
@@ -152,12 +149,14 @@ TEST(spsTest, readCommonSps)
     }
 
     std::vector<uint8_t> buffer(sizeof(data));
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWNalByteStream rwnbs(&rwbs);
-    RWBitStream bw(&rwnbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    NalByteStream rwnbs(&rwbs);
+    BitStream bw(&rwnbs);
 
     sps.write(&bw);
-    EXPECT_EQ(br.position(), bw.position());
+    // Writer writes to end of last byte, so we need to round up to nearest byte
+    auto byteEnd = (br.position() + 7) & 0xfff8;
+    EXPECT_EQ(byteEnd, bw.position());
 
     EXPECT_TRUE(bw.isOk());
 

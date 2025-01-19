@@ -51,7 +51,7 @@ namespace h26x {
         return scaleVector;
     }
 
-    void SPS::ProfileIdcInfoExt::write(RWBitStream *bitWriter) const {
+    void SPS::ProfileIdcInfoExt::write(BitStream *bitWriter) const {
         ExpGolomb::set(chromaFormatIdc, bitWriter);
         if (chromaFormatIdc == CHROMA_FORMAT_IDC_444) {
             bitWriter->set(separateColourPlaneFlag);
@@ -73,7 +73,7 @@ namespace h26x {
 
     SPS::PicOrderCountType::PicOrderCountType(uint8_t type):type(type) {}
 
-    void SPS::PicOrderCountType::write(RWBitStream *bitWriter) const {
+    void SPS::PicOrderCountType::write(BitStream *bitWriter) const {
         ExpGolomb::set(type, bitWriter);
     }
 
@@ -81,7 +81,7 @@ namespace h26x {
         log2MaxPicOrderCntLsbMinus4 = ExpGolomb::get(bitstream);
     }
 
-    void SPS::PicOrderCountType0::write(RWBitStream *bitWriter) const {
+    void SPS::PicOrderCountType0::write(BitStream *bitWriter) const {
         PicOrderCountType::write(bitWriter);
         ExpGolomb::set(log2MaxPicOrderCntLsbMinus4, bitWriter);
     }
@@ -99,7 +99,7 @@ namespace h26x {
         }
     }
 
-    void SPS::PicOrderCountType1::write(RWBitStream *bitWriter) const {
+    void SPS::PicOrderCountType1::write(BitStream *bitWriter) const {
         PicOrderCountType::write(bitWriter);
         bitWriter->set(deltaPicOrderAlwaysZeroFlag);
         ExpGolomb::setSigned(offsetForNonRefPic, bitWriter);
@@ -117,7 +117,7 @@ namespace h26x {
         bottom = ExpGolomb::get(bitstream);
     }
 
-    void SPS::FrameCropOffset::write(RWBitStream *bitWriter) const {
+    void SPS::FrameCropOffset::write(BitStream *bitWriter) const {
         ExpGolomb::set(left, bitWriter);
         ExpGolomb::set(right, bitWriter);
         ExpGolomb::set(top, bitWriter);
@@ -183,7 +183,7 @@ namespace h26x {
         return br->isOk();
     }
 
-    void SPS::write(RWBitStream *bitWriter) const {
+    void SPS::write(BitStream *bitWriter) const {
         bitWriter->set(profileIdc, 8);
         bitWriter->set(constraintSet0Flag);
         bitWriter->set(constraintSet1Flag);

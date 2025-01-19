@@ -3,8 +3,8 @@
 //
 //------------------------------------------------------------------------------
 #include <gtest/gtest.h>
-#include "../include/RWBufferStream.h"
-#include "RWBitStream.h"
+#include "../include/BufferStream.h"
+#include "BitStream.h"
 #include "ExpGolomb.h"
 
 using namespace h26x;
@@ -14,8 +14,8 @@ using bytes = std::vector<uint8_t>;
 TEST(bitwriterTest, InitialState) {
     std::vector<uint8_t> buffer(0);
 
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
 
     EXPECT_EQ(0, w.position());
 }
@@ -24,8 +24,8 @@ TEST(bitwriterTest, InitialState) {
 TEST(bitwriterTest, WriteLessThanBufferNoOffset)
 {
     std::vector<uint8_t> buffer(1);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
 
     ASSERT_NO_THROW(w.set(0xFD, 3));
     EXPECT_EQ(3, w.position());
@@ -37,8 +37,8 @@ TEST(bitwriterTest, WriteLessThanBufferNoOffset)
 TEST(bitwriterTest, WriteLessThanBufferWithOffset)
 {
     std::vector<uint8_t> buffer(2);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
     ASSERT_NO_THROW(w.set(0xFF, 3));
     EXPECT_EQ(3, w.position());
     w.flush();
@@ -53,8 +53,8 @@ TEST(bitwriterTest, WriteLessThanBufferWithOffset)
 TEST(bitwriterTest, WriteExactBufferNoOffset)
 {
     std::vector<uint8_t> buffer(1);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
 
     ASSERT_NO_THROW(w.set(0x57, 8));
     EXPECT_EQ(8, w.position());
@@ -64,8 +64,8 @@ TEST(bitwriterTest, WriteExactBufferNoOffset)
 TEST(bitwriterTest, WriteExactBufferWithOffset)
 {
     std::vector<uint8_t> buffer(1);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
 
     ASSERT_NO_THROW(w.set(0xFF, 3));
     EXPECT_EQ(3, w.position());
@@ -81,8 +81,8 @@ TEST(bitwriterTest, WriteExactBufferWithOffset)
 TEST(bitwriterTest, WriteMoreThanTwoBuffers)
 {
     std::vector<uint8_t> buffer(4);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
 
     w.set(6, 4);
     EXPECT_EQ(4, w.position());
@@ -96,8 +96,8 @@ TEST(bitwriterTest, WriteMoreThanTwoBuffers)
 TEST(bitwriterTest, TestSkip)
 {
     std::vector<uint8_t> buffer(3);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
 
     w.set(6, 4);
     w.skip(13);
@@ -111,8 +111,8 @@ TEST(bitwriterTest, TestSkip)
 TEST(bitwriterTest, WriteFromVar)
 {
     std::vector<uint8_t> buffer(3);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
     uint8_t v = 0x42;
     w.set(v, 8);
     w.set(false);
@@ -130,8 +130,8 @@ TEST(bitwriterTest, WriteFromVar)
 TEST(bitwriterTest, SetExpGolomb)
 {
     std::vector<uint8_t> buffer(3);
-    RWBufferStream rwbs(buffer.data(), buffer.capacity());
-    RWBitStream w(&rwbs);
+    BufferStream rwbs(buffer.data(), buffer.capacity());
+    BitStream w(&rwbs);
     ExpGolomb::set(5, &w);
     EXPECT_EQ(5, w.position());
     ExpGolomb::setSigned(-42, &w);

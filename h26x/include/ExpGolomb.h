@@ -5,7 +5,6 @@
 #ifndef H26X_UTILS_EXPGOLOMB_H
 #define H26X_UTILS_EXPGOLOMB_H
 #include "BitStream.h"
-#include "RWBitStream.h"
 
 namespace h26x {
 
@@ -13,8 +12,8 @@ namespace h26x {
     public:
         static uint32_t get(BitStream * bitStream);
         static int32_t getSigned(BitStream * bitStream);
-        static void set(uint32_t v, RWBitStream * rwBitStream);
-        static void setSigned(int32_t v, RWBitStream * rwBitStream);
+        static void set(uint32_t v, BitStream * rwBitStream);
+        static void setSigned(int32_t v, BitStream * rwBitStream);
     };
 
 } // h26x

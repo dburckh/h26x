@@ -19,10 +19,10 @@ namespace h26x {
         return ((codeNum % 2) == 0 ? -1 : 1) * (((int32_t) codeNum + 1) / 2);
     }
 
-    void ExpGolomb::set(uint32_t v, RWBitStream *rwBitStream) {
-        int bits = 0;
+    void ExpGolomb::set(uint32_t v, BitStream *rwBitStream) {
+        uint8_t bits = 0;
         int cumul = 0;
-        for (int i = 0; i < 15; i++) {
+        for (uint8_t i = 0; i < 15; i++) {
             if (v < cumul + (1 << i)) {
                 bits = i;
                 break;
@@ -34,7 +34,7 @@ namespace h26x {
         rwBitStream->set(v - cumul, bits);
     }
 
-    void ExpGolomb::setSigned(int32_t v, RWBitStream *rwBitStream) {
+    void ExpGolomb::setSigned(int32_t v, BitStream *rwBitStream) {
         uint32_t uintV = v == 0 ? 0 : (abs(v) << 1) - (~v >> 31);
         set(uintV, rwBitStream);
 

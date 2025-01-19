@@ -11,7 +11,7 @@ namespace h26x {
             aspectRatioIdc) {
     }
 
-    void VuiParameters::AspectRatio::write(RWBitStream *bitWriter) const {
+    void VuiParameters::AspectRatio::write(BitStream *bitWriter) const {
         bitWriter->set(aspectRationIdc, 8);
     }
 
@@ -21,7 +21,7 @@ namespace h26x {
         sarHeight = bitstream->get<uint16_t>(16);
     }
 
-    void VuiParameters::AspectRatioExt::write(RWBitStream *bitWriter) const {
+    void VuiParameters::AspectRatioExt::write(BitStream *bitWriter) const {
         AspectRatio::write(bitWriter);
         bitWriter->set(sarWidth, 16);
         bitWriter->set(sarHeight, 16);
@@ -38,7 +38,7 @@ namespace h26x {
         delete colourDescription;
     }
 
-    void VuiParameters::VideoSignalType::write(RWBitStream *bitWriter) const {
+    void VuiParameters::VideoSignalType::write(BitStream *bitWriter) const {
         bitWriter->set(videoFormat, 3);
         bitWriter->set(videoFullRange);
         Writable::setFlagAndWrite(bitWriter, colourDescription);
@@ -50,7 +50,7 @@ namespace h26x {
         matrixCoefficients = bitstream->get<uint8_t>(8);
     }
 
-    void VuiParameters::ColourDescription::write(RWBitStream *bitWriter) const {
+    void VuiParameters::ColourDescription::write(BitStream *bitWriter) const {
         bitWriter->set(colourPrimaries, 8);
         bitWriter->set(transferCharacteristics, 8);
         bitWriter->set(matrixCoefficients, 8);
@@ -61,7 +61,7 @@ namespace h26x {
         typeBottomField = ExpGolomb::get(bitstream);
     }
 
-    void VuiParameters::ChromaLoc::write(RWBitStream *bitWriter) const {
+    void VuiParameters::ChromaLoc::write(BitStream *bitWriter) const {
         ExpGolomb::set(typeTopField, bitWriter);
         ExpGolomb::set(typeBottomField, bitWriter);
     }
@@ -72,7 +72,7 @@ namespace h26x {
         fixedFrameRateFlag = bitstream->get();
     }
 
-    void VuiParameters::Timing::write(RWBitStream *bitWriter) const {
+    void VuiParameters::Timing::write(BitStream *bitWriter) const {
         bitWriter->set(numUnitsInTick, 32);
         bitWriter->set(timeScale, 32);
         bitWriter->set(fixedFrameRateFlag);
@@ -93,7 +93,7 @@ namespace h26x {
         timeOffsetLength = bitstream->get<uint8_t>(5);
     }
 
-    void VuiParameters::HrdParameters::write(RWBitStream *bitWriter) const {
+    void VuiParameters::HrdParameters::write(BitStream *bitWriter) const {
         ExpGolomb::set(cpb.capacity() - 1, bitWriter);
         bitWriter->set(bitRateScale, 4);
         bitWriter->set(cpbSizeScale, 4);
@@ -118,7 +118,7 @@ namespace h26x {
         maxDecFrameBuffering = ExpGolomb::get(bitstream);
     }
 
-    void VuiParameters::BitstreamRestriction::write(RWBitStream *bitWriter) const {
+    void VuiParameters::BitstreamRestriction::write(BitStream *bitWriter) const {
         bitWriter->set(motionVectorsOverPicBoundariesFlag);
         ExpGolomb::set(maxBitsPerMbDenom, bitWriter);
         ExpGolomb::set(maxBitsPerMbDenom, bitWriter);
@@ -172,7 +172,7 @@ namespace h26x {
     void VuiParameters::clearOverscanAppropriateFlag() {
         overscanAppropriateFlag = overscanInfoPresentFlag = false;
     }
-    void VuiParameters::write(RWBitStream *bitWriter) const {
+    void VuiParameters::write(BitStream *bitWriter) const {
         Writable::setFlagAndWrite(bitWriter, aspectRatio.get());
         bitWriter->set(overscanInfoPresentFlag);
         if (overscanInfoPresentFlag) {

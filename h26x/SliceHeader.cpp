@@ -5,6 +5,7 @@
 #include "SliceHeader.h"
 #include "ByteStream.h"
 #include "ExpGolomb.h"
+#include "BufferStream.h"
 #include <iostream>
 
 #define IN_RANGE_OR_RETURN(val, min, max)                                   \

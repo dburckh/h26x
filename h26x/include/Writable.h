@@ -4,14 +4,14 @@
 
 #ifndef USB_CAMERA_VIEWER_WRITABLE_H
 #define USB_CAMERA_VIEWER_WRITABLE_H
-#include "RWBitStream.h"
+#include "BitStream.h"
 
 namespace h26x {
     class Writable {
     public:
-        virtual void write(RWBitStream *bitWriter) const = 0;
+        virtual void write(BitStream *bitWriter) const = 0;
 
-        static void setFlagAndWrite(RWBitStream *bitWriter, Writable * writable) {
+        static void setFlagAndWrite(BitStream *bitWriter, Writable * writable) {
             if (writable) {
                 bitWriter->set(true);
                 writable->write(bitWriter);

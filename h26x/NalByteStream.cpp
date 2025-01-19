@@ -42,4 +42,15 @@ namespace h26x {
         return false;
     }
 
+    bool NalByteStream::write(uint8_t byte) {
+        if (mPrior1 == 0 && mPrior2 == 0 && byte <= 3) {
+            if (mByteStream->write(3)) {
+                mByteStream->skip(1);
+                mPrior1 = 3;
+            } else {
+                return false;
+            }
+        }
+        return mByteStream->write(byte);
+    }
 } // h26x

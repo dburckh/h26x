@@ -25,44 +25,5 @@ project("h26x")
 # for GameActivity/NativeActivity derived applications, the same library name must be
 # used in the AndroidManifest.xml file.
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-add_library(${CMAKE_PROJECT_NAME} SHARED
-        # List C/C++ source files with relative paths to this CMakeLists.txt.
-        h26x/BufferStream.cpp
-        h26x/NalByteStream.cpp
-        h26x/RWBufferStream.cpp
-        h26x/RWNalByteStream.cpp
-        h26x/BitStream.cpp
-        h26x/RWBitStream.cpp
-        h26x/ExpGolomb.cpp
-        h26x/SPS.cpp
-        h26x/PPS.cpp
-        h26x/VuiParameters.cpp
-        h26x/KMPSearch.cpp
-        h26x/NalUnit.cpp
-        h26x/NalUnitFinder.cpp
-        h26x/PictureCounter.cpp
-        h26x/SliceHeader.cpp
-)
-target_include_directories(h26x
-        PUBLIC
-        h26x/include/
-)
-# Specifies libraries CMake should link to your target library. You
-# can link libraries from various origins, such as libraries defined in this
-# build script, prebuilt third-party libraries, or Android system libraries.
-target_link_libraries(${CMAKE_PROJECT_NAME}
-)
-set(GOOGLETEST_ROOT ${ANDROID_NDK}/sources/third_party/googletest)
-add_library(gtest STATIC ${GOOGLETEST_ROOT}/src/gtest_main.cc ${GOOGLETEST_ROOT}/src/gtest-all.cc)
-target_include_directories(gtest PRIVATE ${GOOGLETEST_ROOT})
-target_include_directories(gtest PUBLIC ${GOOGLETEST_ROOT}/include)
-
-add_executable(h26xtest
-        h26x/test/BitReaderTest.cpp
-        h26x/test/BitWriterTest.cpp
-        h26x/test/SpsTest.cpp
-        h26x/test/PpsTest.cpp
-#        h26x/test/NalUnitFinderTest.cpp
-#        h26x/test/SliceHeaderTest.cpp
-)
-target_link_libraries(h26xtest h26x gtest)
+enable_testing()
+add_subdirectory(h26x)
