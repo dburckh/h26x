@@ -41,8 +41,9 @@ namespace h26x {
     bool SliceHeader::parseRefPicListModification(BitStream * br,
                                                      uint32_t num_ref_idx_active_minus1,
                                                      std::vector<H264ModificationOfPicNum> *ref_list_mods) {
-        ref_list_mods->reserve(num_ref_idx_active_minus1 + 1);
-        for (int i = 0; i < 32; ++i) {
+        const auto s = num_ref_idx_active_minus1 + 1;
+        ref_list_mods->reserve(s);
+        for (int i = 0; s; ++i) {
             auto modification_of_pic_nums_idc = ExpGolomb::get(br);
             if (modification_of_pic_nums_idc >= 4) {
                 return false;
@@ -96,39 +97,41 @@ namespace h26x {
             BitStream * br,
             uint32_t num_ref_idx_active_minus1,
             uint8_t chroma_array_type,
-            uint32_t luma_log2_weight_denom,
-            uint32_t chroma_log2_weight_denom,
             H264WeightingFactors* w_facts) {
-        int def_luma_weight = 1 << luma_log2_weight_denom;
-        int def_chroma_weight = 1 << chroma_log2_weight_denom;
+        auto s = num_ref_idx_active_minus1 + 1;
 
-        for (int i = 0; i < num_ref_idx_active_minus1 + 1; ++i) {
-            w_facts->luma_weight_flag = br->get();
-            if (w_facts->luma_weight_flag) {
-                w_facts->luma_weight[i] = ExpGolomb::getSigned(br);
-                IN_RANGE_OR_RETURN(w_facts->luma_weight[i], -128, 127);
+        w_facts->luma_weight = new int8_t[s];
+        std::fill_n(w_facts->luma_weight, s, getLumaWeightDenom());
+        w_facts->luma_offset = new int8_t[s]{};
+        if (chroma_array_type != 0) {
+            w_facts->chroma_weight = new int8_t[s][2];
+            std::fill_n(&w_facts->chroma_weight[0][0], s*2, getChromaWeightDenom());
+            w_facts->chroma_offset = new int8_t[s][2]{};
+        }
 
-                w_facts->luma_offset[i] = ExpGolomb::getSigned(br);
-                IN_RANGE_OR_RETURN(w_facts->luma_offset[i], -128, 127);
-            } else {
-                w_facts->luma_weight[i] = def_luma_weight;
-                w_facts->luma_offset[i] = 0;
+        for (int i = 0; i < s; ++i) {
+            //luma_weight_flag
+            if (br->get()) {
+                auto v = ExpGolomb::getSigned(br);
+                IN_RANGE_OR_RETURN(v, -128, 127);
+                w_facts->luma_weight[i] = (int8_t)v;
+
+                v = ExpGolomb::getSigned(br);
+                IN_RANGE_OR_RETURN(v, -128, 127);
+                w_facts->luma_offset[i] =(int8_t)v;
             }
 
             if (chroma_array_type != 0) {
-                w_facts->chroma_weight_flag = br->get();
-                if (w_facts->chroma_weight_flag) {
+                //chroma_weight_flag
+                if (br->get()) {
                     for (int j = 0; j < 2; ++j) {
-                        w_facts->chroma_weight[i][j] = ExpGolomb::getSigned(br);
-                        IN_RANGE_OR_RETURN(w_facts->chroma_weight[i][j], -128, 127);
+                        auto v = ExpGolomb::getSigned(br);
+                        IN_RANGE_OR_RETURN(v, -128, 127);
+                        w_facts->chroma_weight[i][j] = (int8_t)v;
 
-                        w_facts->chroma_offset[i][j] = ExpGolomb::getSigned(br);
-                        IN_RANGE_OR_RETURN(w_facts->chroma_offset[i][j], -128, 127);
-                    }
-                } else {
-                    for (int j = 0; j < 2; ++j) {
-                        w_facts->chroma_weight[i][j] = def_chroma_weight;
-                        w_facts->chroma_offset[i][j] = 0;
+                        v = ExpGolomb::getSigned(br);
+                        IN_RANGE_OR_RETURN(v, -128, 127);
+                        w_facts->chroma_offset[i][j] = (int8_t)v;
                     }
                 }
             }
@@ -152,7 +155,6 @@ namespace h26x {
         pred_weight_table_l0 = std::make_unique<H264WeightingFactors>();
         auto res = parseWeightingFactors(br,
                 num_ref_idx_l0_active_minus1, sps->getChromaArrayType(),
-                luma_log2_weight_denom, chroma_log2_weight_denom,
                 pred_weight_table_l0.get());
         if (!res) return res;
 
@@ -160,7 +162,6 @@ namespace h26x {
             pred_weight_table_l1 = std::make_unique<H264WeightingFactors>();
             res = parseWeightingFactors(br,
                     num_ref_idx_l1_active_minus1, sps->getChromaArrayType(),
-                    luma_log2_weight_denom, chroma_log2_weight_denom,
                     pred_weight_table_l1.get());
             if (!res) return res;
         }
@@ -271,9 +272,8 @@ namespace h26x {
             }
         }
         auto max = field_pic_flag ? 32 : 16;
-        // TODO: Fix this
         if (num_ref_idx_l0_active_minus1 >= max ||
-            num_ref_idx_active_override_flag >= max) {
+                num_ref_idx_l1_active_minus1 >= max) {
             return false;
         }
         if (nalUnit->getH264Type() == NAL_TYPE_SLICE_EXT) {
@@ -296,4 +296,13 @@ namespace h26x {
 
         return br.isOk();
     }
+
+    int8_t SliceHeader::getLumaWeightDenom() const {
+        return (int8_t)(1 << luma_log2_weight_denom);
+    }
+
+    int8_t SliceHeader::getChromaWeightDenom() const {
+        return (int8_t)(1 << chroma_log2_weight_denom);
+    }
+
 } // h26x

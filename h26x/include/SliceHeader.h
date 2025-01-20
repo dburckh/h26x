@@ -20,12 +20,10 @@ namespace h26x {
         };
     };
     struct H264WeightingFactors {
-            bool luma_weight_flag;
-            bool chroma_weight_flag;
-            int luma_weight[32];
-            int luma_offset[32];
-            int chroma_weight[32][2];
-            int chroma_offset[32][2];
+            int8_t *luma_weight;
+            int8_t *luma_offset;
+            int8_t (*chroma_weight)[2];
+            int8_t (*chroma_offset)[2];
     };
     struct H264DecRefPicMarking {
             uint32_t memory_mgmnt_control_operation;
@@ -43,6 +41,8 @@ namespace h26x {
         bool isSPSlice() const;
         bool isISlice() const;
         bool isSISlice() const;
+        int8_t getLumaWeightDenom() const;
+        int8_t getChromaWeightDenom() const;
 
         uint32_t first_mb_in_slice;
         uint32_t slice_type;
@@ -91,12 +91,10 @@ namespace h26x {
                 BitStream * br,
                 uint32_t num_ref_idx_active_minus1,
                 std::vector<H264ModificationOfPicNum> *ref_list_mods);
-        static bool parseWeightingFactors(
+        bool parseWeightingFactors(
                 BitStream * br,
                 uint32_t num_ref_idx_active_minus1,
                 uint8_t chroma_array_type,
-                uint32_t luma_log2_weight_denom,
-                uint32_t chroma_log2_weight_denom,
                 H264WeightingFactors* w_facts);
         bool parseRefPicListModifications(BitStream * br);
         bool parsePredWeightTable(BitStream * br, SPS * sps);

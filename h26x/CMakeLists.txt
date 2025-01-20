@@ -33,6 +33,6 @@ add_executable(h26xtest
         test/SpsTest.cpp
         test/PpsTest.cpp
         #        h26x/test/NalUnitFinderTest.cpp
-        #        h26x/test/SliceHeaderTest.cpp
+        test/SliceHeaderTest.cpp
 )
 target_link_libraries(h26xtest h26x gtest)

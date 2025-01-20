@@ -179,7 +179,6 @@ namespace h26x {
         vuiParameters = br->get() ? std::make_unique<VuiParameters>(br) : nullptr;
         //rbsp_stop_one_bit
         bool rbsp_stop_one_bit = br->get(); // Should be true
-        std::cout << "stop= " << rbsp_stop_one_bit << "\n";
         return br->isOk();
     }
 
