@@ -40,7 +40,7 @@ namespace h26x {
 
         [[nodiscard]] size_t getSize() const;
         [[nodiscard]] const uint8_t * getNalTypePointer() const;
-        BufferStream getPayload() const;
+        [[nodiscard]] BufferStream getPayload() const;
         /**
          * Return the pointer to start of the NAL Unit payload (after type)
          */

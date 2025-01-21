@@ -22,19 +22,5 @@ target_include_directories(h26x
 # build script, prebuilt third-party libraries, or Android system libraries.
 target_link_libraries(${CMAKE_PROJECT_NAME}
 )
-set(GOOGLETEST_ROOT ${ANDROID_NDK}/sources/third_party/googletest)
-add_library(gtest STATIC ${GOOGLETEST_ROOT}/src/gtest_main.cc ${GOOGLETEST_ROOT}/src/gtest-all.cc)
-target_include_directories(gtest PRIVATE ${GOOGLETEST_ROOT})
-target_include_directories(gtest PUBLIC ${GOOGLETEST_ROOT}/include)
-
-add_executable(h26xtest
-        test/BitReaderTest.cpp
-        test/BitWriterTest.cpp
-        test/SpsTest.cpp
-        test/PpsTest.cpp
-        test/NalUnitFinderTest.cpp
-        test/SliceHeaderTest.cpp
-        test/PictureCountTest.cpp
-)
-target_link_libraries(h26xtest h26x gtest)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/bbb.h264 ${CMAKE_CURRENT_BINARY_DIR}/Debug/bbb.h264 COPYONLY)
+enable_testing()
+add_subdirectory(test)

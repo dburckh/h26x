@@ -8,6 +8,7 @@
 
 
 #define NAL_NOT_FOUND 255
+#include <memory>
 #include "KMPSearch.h"
 #include "NalUnit.h"
 

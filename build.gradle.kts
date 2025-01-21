@@ -11,7 +11,9 @@ android {
     defaultConfig {
         minSdk = 21
         externalNativeBuild {
-            cmake
+            cmake {
+                arguments.add("-DANDROID_STL=c++_shared")
+            }
         }
     }
     buildFeatures {
@@ -33,16 +35,15 @@ android {
         singleVariant("release")
     }
 }
-//gradlew h264bitstream:publish
-//afterEvaluate {
-//    publishing {
-//        publications {
-//            register("h264bitstream", MavenPublication::class) {
-//                from(components["release"])
-//                groupId = "com.homesoft.android"
-//                artifactId = "h264bitstream"
-//                version = "0.2.0"
-//            }
-//        }
-//    }
-//}
+afterEvaluate {
+    publishing {
+        publications {
+            register("h26x", MavenPublication::class) {
+                from(components["release"])
+                groupId = "com.homesoft.android"
+                artifactId = "h26x"
+                version = "0.1.0"
+            }
+        }
+    }
+}

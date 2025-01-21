@@ -9,8 +9,7 @@ namespace h26x {
     KMPSearch::KMPSearch(const uint8_t *needle, int needleLen):
             needleLen{needleLen},
             mNeedle{needle},
-            mLps{new int[needleLen]} {
-
+            mLps{new int[needleLen]}{
         // length of the previous longest prefix suffix
         int len = 0;
 
@@ -65,6 +64,10 @@ namespace h26x {
             }
         }
         return nullptr;
+    }
+
+    KMPSearch::~KMPSearch() {
+        delete[] mLps;
     }
 }
 
