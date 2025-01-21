@@ -9,14 +9,14 @@
 namespace h26x {
     class Writable {
     public:
-        virtual void write(BitStream *bitWriter) const = 0;
+        virtual void write(BitStream &bitWriter) const = 0;
 
-        static void setFlagAndWrite(BitStream *bitWriter, Writable * writable) {
+        static void setFlagAndWrite(BitStream &bitWriter, Writable * writable) {
             if (writable) {
-                bitWriter->set(true);
+                bitWriter.set(true);
                 writable->write(bitWriter);
             } else {
-                bitWriter->set(false);
+                bitWriter.set(false);
             }
         };
     };

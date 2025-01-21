@@ -10,10 +10,10 @@ namespace h26x {
 
     class ExpGolomb {
     public:
-        static uint32_t get(BitStream * bitStream);
-        static int32_t getSigned(BitStream * bitStream);
-        static void set(uint32_t v, BitStream * rwBitStream);
-        static void setSigned(int32_t v, BitStream * rwBitStream);
+        static uint32_t get(BitStream &bitStream);
+        static int32_t getSigned(BitStream &bitStream);
+        static void set(uint32_t v, BitStream &bitStream);
+        static void setSigned(int32_t v, BitStream &bitStream);
     };
 
 } // h26x

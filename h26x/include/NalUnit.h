@@ -25,6 +25,7 @@
 #define H265_NAL_SPS				33 // Sequence parameter set
 #define H265_NAL_PPS				34 // Picture parameter set
 #include <cstdint>
+#include "BufferStream.h"
 
 namespace h26x {
 
@@ -39,7 +40,14 @@ namespace h26x {
 
         [[nodiscard]] size_t getSize() const;
         [[nodiscard]] const uint8_t * getNalTypePointer() const;
+        BufferStream getPayload() const;
+        /**
+         * Return the pointer to start of the NAL Unit payload (after type)
+         */
         [[nodiscard]] const uint8_t * getNalUnitPointer() const;
+        /**
+         * Return size the NAL Unit payload (after type)
+         */
         [[nodiscard]] size_t getNalUnitSize() const;
         [[nodiscard]] uint8_t getNalRefIdc() const;
 

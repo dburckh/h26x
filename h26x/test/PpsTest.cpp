@@ -16,7 +16,7 @@ TEST(ppsTest, readPps) {
     BufferStream bs(data, sizeof(data));
     BitStream br(&bs);
     PPS pps;
-    pps.read(&br);
+    pps.read(br);
 
     EXPECT_EQ(0, pps.picParameterSetId);
     EXPECT_EQ(0, pps.seqParameterSetId);

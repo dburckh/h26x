@@ -20,7 +20,7 @@ TEST(spsTest, readSps)
     BufferStream robs(data, sizeof(data));
     BitStream br(&robs);
     SPS sps;
-    sps.read(&br);
+    sps.read(br);
 
     EXPECT_EQ(66, sps.profileIdc);
 
@@ -70,7 +70,7 @@ TEST(spsTest, readSps)
     BufferStream rwbs(buffer.data(), buffer.capacity());
     BitStream bw(&rwbs);
 
-    sps.write(&bw);
+    sps.write(bw);
     EXPECT_EQ(br.position(), bw.position());
 
     bw.flush();
@@ -91,7 +91,7 @@ TEST(spsTest, readCommonSps)
     NalByteStream nbs(&bs);
     BitStream br(&nbs);
     SPS sps;
-    sps.read(&br);
+    sps.read(br);
 
     EXPECT_EQ(100, sps.profileIdc);
 
@@ -153,7 +153,7 @@ TEST(spsTest, readCommonSps)
     NalByteStream rwnbs(&rwbs);
     BitStream bw(&rwnbs);
 
-    sps.write(&bw);
+    sps.write(bw);
     // Writer writes to end of last byte, so we need to round up to nearest byte
     auto byteEnd = (br.position() + 7) & 0xfff8;
     EXPECT_EQ(byteEnd, bw.position());

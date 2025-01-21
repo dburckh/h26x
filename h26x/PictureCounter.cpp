@@ -5,23 +5,22 @@
 
 #include "include/PictureCounter.h"
 #include "include/NalUnitFinder.h"
-#include "include/SliceHeader.h"
 
 namespace h26x {
-    PictureCounter::PictureCounter(const std::shared_ptr<SPS>& sps, std::shared_ptr<PPS> pps): sps(sps),pps(std::move(pps)),
+    PictureCounter::PictureCounter(std::shared_ptr<SPS> sps, std::shared_ptr<PPS> pps): sps(std::move(sps)),pps(std::move(pps)),
         mMaxFrameNum( 1 << (sps->log2MaxFrameNumMinus4 + 4)) {
     }
     // Check if a slice includes memory management control operation 5, which
     // results in some |pic_order_cnt| state being cleared.
-    bool hasMMCO5(SliceHeader * slice_hdr, NalUnit * nalUnit) {
+    bool PictureCounter::hasMMCO5(SliceHeader const &slice_hdr, NalUnit const &nalUnit) {
         // Require that the frame actually has memory management control operations.
-        if (nalUnit->getNalRefIdc() == 0 ||
-            nalUnit->getH264Type() == NAL_TYPE_IDR ||
-            !slice_hdr->adaptive_ref_pic_marking_mode_flag) {
+        if (nalUnit.getNalRefIdc() == 0 ||
+            nalUnit.getH264Type() == NAL_TYPE_IDR ||
+            !slice_hdr.adaptive_ref_pic_marking_mode_flag) {
             return false;
         }
 
-        for (auto & i : slice_hdr->ref_pic_marking) {
+        for (auto & i : slice_hdr.ref_pic_marking) {
             int32_t op = i.memory_mgmnt_control_operation;
             if (op == 5)
                 return true;
@@ -35,19 +34,19 @@ namespace h26x {
         return false;
     }
 
-    int PictureCounter::getPictureCount(NalUnit * nalUnit) {
+    int PictureCounter::getPictureCount(NalUnit const &nalUnit) {
         SliceHeader sliceHeader;
-        if (!sliceHeader.read(nalUnit, sps.get(), pps.get())) {
+        if (!sliceHeader.read(nalUnit, *sps, *pps)) {
             return -1;
         }
         if (sliceHeader.field_pic_flag) {
             //DLOG(ERROR) << "Interlaced frames are not supported";
             return -1;
         }
-        auto idr_pic_flag = nalUnit->getH264Type() == NAL_TYPE_IDR;
-        auto nal_ref_idc = nalUnit->getNalRefIdc();
+        auto idr_pic_flag = nalUnit.getH264Type() == NAL_TYPE_IDR;
+        auto nal_ref_idc = nalUnit.getNalRefIdc();
         uint32_t pic_order_cnt = 0;
-        bool mmco5 = hasMMCO5(&sliceHeader, nalUnit);
+        bool mmco5 = hasMMCO5(sliceHeader, nalUnit);
 
         int32_t max_frame_num = 1 << (sps->log2MaxFrameNumMinus4 + 4);
 

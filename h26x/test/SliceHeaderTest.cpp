@@ -16,19 +16,19 @@ TEST(sliceHeaderTest, readNonIdr) {
     BufferStream ppsBs(ppsData, sizeof(ppsData));
     BitStream ppsBr(&ppsBs);
     PPS pps;
-    pps.read(&ppsBr);
+    pps.read(ppsBr);
 
     const uint8_t spsData[] = SPS_DATA
     BufferStream spsBs(spsData, sizeof(spsData));
     BitStream spsBr(&spsBs);
     SPS sps;
-    sps.read(&spsBr);
+    sps.read(spsBr);
 
     const uint8_t sliceData[48] = NIDR_SLICE_NAL
 
     NalUnit sliceNalUnit(sliceData, sizeof(sliceData), 4);
     SliceHeader sliceHeader;
-    sliceHeader.read(&sliceNalUnit, &sps, &pps);
+    EXPECT_TRUE(sliceHeader.read(sliceNalUnit, sps, pps));
 
     EXPECT_EQ(5, sliceHeader.slice_type);
     EXPECT_EQ(5, sliceHeader.frame_num);

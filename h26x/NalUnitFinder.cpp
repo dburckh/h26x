@@ -36,7 +36,7 @@ namespace h26x {
         return false;
     }
 
-    NalUnit * NalUnitFinder::findNalUnit(const KMPSearch &search) {
+    std::unique_ptr<NalUnit> NalUnitFinder::findNalUnit(const KMPSearch &search) {
         if (mpPrefix == nullptr) {
             if (!findPrefix(search)) {
                 return nullptr;
@@ -44,14 +44,14 @@ namespace h26x {
         }
         NalUnitFinder prior = *this;
         auto pNalEnd = findPrefix(search) ? mpPrefix : mpBufferEnd;
-        return new NalUnit(prior.mpPrefix, pNalEnd - prior.mpPrefix, search.needleLen);
+        return std::make_unique<NalUnit>(prior.mpPrefix, pNalEnd - prior.mpPrefix, search.needleLen);
     }
 
-    NalUnit * NalUnitFinder::findNalUnit() {
+    std::unique_ptr<NalUnit> NalUnitFinder::findNalUnit() {
         return findNalUnit(NAL3);
     }
 
-    NalUnit *NalUnitFinder::findNalUnit4() {
+    std::unique_ptr<NalUnit> NalUnitFinder::findNalUnit4() {
         return findNalUnit(NAL4);
     }
 

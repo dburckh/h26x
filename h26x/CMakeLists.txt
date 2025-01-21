@@ -32,7 +32,9 @@ add_executable(h26xtest
         test/BitWriterTest.cpp
         test/SpsTest.cpp
         test/PpsTest.cpp
-        #        h26x/test/NalUnitFinderTest.cpp
+        test/NalUnitFinderTest.cpp
         test/SliceHeaderTest.cpp
+        test/PictureCountTest.cpp
 )
 target_link_libraries(h26xtest h26x gtest)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/bbb.h264 ${CMAKE_CURRENT_BINARY_DIR}/Debug/bbb.h264 COPYONLY)

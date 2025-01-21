@@ -45,4 +45,8 @@ namespace h26x {
         return (mpBuffer[mNalTypeOffset] & 0x60) >> 5;
     }
 
+    BufferStream NalUnit::getPayload() const {
+        return {getNalUnitPointer(), getNalUnitSize()};
+    }
+
 } // h26x

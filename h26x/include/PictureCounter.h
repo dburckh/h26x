@@ -8,19 +8,21 @@
 #include "SPS.h"
 #include "PPS.h"
 #include "NalUnit.h"
+#include "SliceHeader.h"
+
 namespace h26x {
 
 
     class PictureCounter {
     public:
-        explicit PictureCounter(const std::shared_ptr<SPS>& sps, std::shared_ptr<PPS> pps);
+        explicit PictureCounter(std::shared_ptr<SPS> sps, std::shared_ptr<PPS> pps);
         /**
          *
          * @param pNalType pointer to the NAL Unit Type byte
          * @param size
          * @return picture count
          */
-        int getPictureCount(NalUnit * nalUnit);
+        int getPictureCount(NalUnit const &nalUnit);
 
         uint32_t mMaxFrameNum;
 
@@ -30,10 +32,9 @@ namespace h26x {
         int32_t prev_frame_num_offset_ {0};
         bool pending_mmco5_ {false};
     private:
+        bool hasMMCO5(SliceHeader const &slice_hdr, NalUnit const &nalUnit);
         std::shared_ptr<SPS> sps;
         std::shared_ptr<PPS> pps;
-
-
     };
 }
 

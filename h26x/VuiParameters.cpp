@@ -11,154 +11,154 @@ namespace h26x {
             aspectRatioIdc) {
     }
 
-    void VuiParameters::AspectRatio::write(BitStream *bitWriter) const {
-        bitWriter->set(aspectRationIdc, 8);
+    void VuiParameters::AspectRatio::write(BitStream &bs) const {
+        bs.set(aspectRationIdc, 8);
     }
 
-    VuiParameters::AspectRatioExt::AspectRatioExt(uint8_t aspectRatioIdc, BitStream *bitstream) :
+    VuiParameters::AspectRatioExt::AspectRatioExt(uint8_t aspectRatioIdc, BitStream &bs) :
             AspectRatio(aspectRatioIdc) {
-        sarWidth = bitstream->get<uint16_t>(16);
-        sarHeight = bitstream->get<uint16_t>(16);
+        sarWidth = bs.get<uint16_t>(16);
+        sarHeight = bs.get<uint16_t>(16);
     }
 
-    void VuiParameters::AspectRatioExt::write(BitStream *bitWriter) const {
-        AspectRatio::write(bitWriter);
-        bitWriter->set(sarWidth, 16);
-        bitWriter->set(sarHeight, 16);
+    void VuiParameters::AspectRatioExt::write(BitStream &bs) const {
+        AspectRatio::write(bs);
+        bs.set(sarWidth, 16);
+        bs.set(sarHeight, 16);
     }
 
-    VuiParameters::VideoSignalType::VideoSignalType(BitStream *bitstream) {
-        videoFormat = bitstream->get<uint8_t>(3);
-        videoFullRange = bitstream->get();
+    VuiParameters::VideoSignalType::VideoSignalType(BitStream &bs) {
+        videoFormat = bs.get<uint8_t>(3);
+        videoFullRange = bs.get();
         // colour_description_present_flag
-        colourDescription = bitstream->get() ? new ColourDescription(bitstream) : nullptr;
+        colourDescription = bs.get() ? new ColourDescription(bs) : nullptr;
     }
 
     VuiParameters::VideoSignalType::~VideoSignalType() {
         delete colourDescription;
     }
 
-    void VuiParameters::VideoSignalType::write(BitStream *bitWriter) const {
-        bitWriter->set(videoFormat, 3);
-        bitWriter->set(videoFullRange);
-        Writable::setFlagAndWrite(bitWriter, colourDescription);
+    void VuiParameters::VideoSignalType::write(BitStream &bs) const {
+        bs.set(videoFormat, 3);
+        bs.set(videoFullRange);
+        Writable::setFlagAndWrite(bs, colourDescription);
     }
 
-    VuiParameters::ColourDescription::ColourDescription(BitStream* bitstream) {
-        colourPrimaries = bitstream->get<uint8_t>(8);
-        transferCharacteristics = bitstream->get<uint8_t>(8);
-        matrixCoefficients = bitstream->get<uint8_t>(8);
+    VuiParameters::ColourDescription::ColourDescription(BitStream &bs) {
+        colourPrimaries = bs.get<uint8_t>(8);
+        transferCharacteristics = bs.get<uint8_t>(8);
+        matrixCoefficients = bs.get<uint8_t>(8);
     }
 
-    void VuiParameters::ColourDescription::write(BitStream *bitWriter) const {
-        bitWriter->set(colourPrimaries, 8);
-        bitWriter->set(transferCharacteristics, 8);
-        bitWriter->set(matrixCoefficients, 8);
+    void VuiParameters::ColourDescription::write(BitStream &bs) const {
+        bs.set(colourPrimaries, 8);
+        bs.set(transferCharacteristics, 8);
+        bs.set(matrixCoefficients, 8);
     }
 
-    VuiParameters::ChromaLoc::ChromaLoc(BitStream *bitstream) {
-        typeTopField = ExpGolomb::get(bitstream);
-        typeBottomField = ExpGolomb::get(bitstream);
+    VuiParameters::ChromaLoc::ChromaLoc(BitStream &bs) {
+        typeTopField = ExpGolomb::get(bs);
+        typeBottomField = ExpGolomb::get(bs);
     }
 
-    void VuiParameters::ChromaLoc::write(BitStream *bitWriter) const {
-        ExpGolomb::set(typeTopField, bitWriter);
-        ExpGolomb::set(typeBottomField, bitWriter);
+    void VuiParameters::ChromaLoc::write(BitStream &bs) const {
+        ExpGolomb::set(typeTopField, bs);
+        ExpGolomb::set(typeBottomField, bs);
     }
 
-    VuiParameters::Timing::Timing(BitStream *bitstream) {
-        numUnitsInTick = bitstream->get<uint32_t>(32);
-        timeScale = bitstream->get<uint32_t>(32);
-        fixedFrameRateFlag = bitstream->get();
+    VuiParameters::Timing::Timing(BitStream &bs) {
+        numUnitsInTick = bs.get<uint32_t>(32);
+        timeScale = bs.get<uint32_t>(32);
+        fixedFrameRateFlag = bs.get();
     }
 
-    void VuiParameters::Timing::write(BitStream *bitWriter) const {
-        bitWriter->set(numUnitsInTick, 32);
-        bitWriter->set(timeScale, 32);
-        bitWriter->set(fixedFrameRateFlag);
+    void VuiParameters::Timing::write(BitStream &bs) const {
+        bs.set(numUnitsInTick, 32);
+        bs.set(timeScale, 32);
+        bs.set(fixedFrameRateFlag);
     }
 
-    VuiParameters::HrdParameters::HrdParameters(BitStream* bitstream) {
+    VuiParameters::HrdParameters::HrdParameters(BitStream &bs) {
         // cpb_cnt_minus1
-        auto count = ExpGolomb::get(bitstream) + 1;
+        auto count = ExpGolomb::get(bs) + 1;
         cpb.reserve(count);
-        bitRateScale = bitstream->get<uint8_t>(4);
-        cpbSizeScale = bitstream->get<uint8_t>(4);
+        bitRateScale = bs.get<uint8_t>(4);
+        cpbSizeScale = bs.get<uint8_t>(4);
         for (int i=0;i<count;i++) {
-            cpb.push_back(CodedPictureBuffer{ExpGolomb::get(bitstream), ExpGolomb::get(bitstream), bitstream->get()});
+            cpb.push_back(CodedPictureBuffer{ExpGolomb::get(bs), ExpGolomb::get(bs), bs.get()});
         }
-        initialCpbRemovalDelayLengthMinus1 = bitstream->get<uint8_t>(5);
-        cpbRemovalDelayLengthMinus1 = bitstream->get<uint8_t>(5);
-        dpbOutputDelayLengthMinus1 = bitstream->get<uint8_t>(5);
-        timeOffsetLength = bitstream->get<uint8_t>(5);
+        initialCpbRemovalDelayLengthMinus1 = bs.get<uint8_t>(5);
+        cpbRemovalDelayLengthMinus1 = bs.get<uint8_t>(5);
+        dpbOutputDelayLengthMinus1 = bs.get<uint8_t>(5);
+        timeOffsetLength = bs.get<uint8_t>(5);
     }
 
-    void VuiParameters::HrdParameters::write(BitStream *bitWriter) const {
-        ExpGolomb::set(cpb.capacity() - 1, bitWriter);
-        bitWriter->set(bitRateScale, 4);
-        bitWriter->set(cpbSizeScale, 4);
+    void VuiParameters::HrdParameters::write(BitStream &bs) const {
+        ExpGolomb::set(cpb.capacity() - 1, bs);
+        bs.set(bitRateScale, 4);
+        bs.set(cpbSizeScale, 4);
         for (auto &&codedPictureBuffer : cpb) {
-            ExpGolomb::set(codedPictureBuffer.bitRateValueMinus1, bitWriter);
-            ExpGolomb::set(codedPictureBuffer.cpbSizeValueMinus1, bitWriter);
-            bitWriter->set(codedPictureBuffer.cbrFlag);
+            ExpGolomb::set(codedPictureBuffer.bitRateValueMinus1, bs);
+            ExpGolomb::set(codedPictureBuffer.cpbSizeValueMinus1, bs);
+            bs.set(codedPictureBuffer.cbrFlag);
         }
-        bitWriter->set(initialCpbRemovalDelayLengthMinus1, 5);
-        bitWriter->set(cpbRemovalDelayLengthMinus1, 5);
-        bitWriter->set(dpbOutputDelayLengthMinus1, 5);
-        bitWriter->set(timeOffsetLength, 5);
+        bs.set(initialCpbRemovalDelayLengthMinus1, 5);
+        bs.set(cpbRemovalDelayLengthMinus1, 5);
+        bs.set(dpbOutputDelayLengthMinus1, 5);
+        bs.set(timeOffsetLength, 5);
     }
 
-    VuiParameters::BitstreamRestriction::BitstreamRestriction(BitStream *bitstream) {
-        motionVectorsOverPicBoundariesFlag = bitstream->get();
-        maxBytesPerPicDenom = ExpGolomb::get(bitstream);
-        maxBitsPerMbDenom = ExpGolomb::get(bitstream);
-        log2maxMvLengthHorizontal = ExpGolomb::get(bitstream);
-        log2maxMvLengthVertical = ExpGolomb::get(bitstream);
-        numReorderFrames = ExpGolomb::get(bitstream);
-        maxDecFrameBuffering = ExpGolomb::get(bitstream);
+    VuiParameters::BitstreamRestriction::BitstreamRestriction(BitStream &bs) {
+        motionVectorsOverPicBoundariesFlag = bs.get();
+        maxBytesPerPicDenom = ExpGolomb::get(bs);
+        maxBitsPerMbDenom = ExpGolomb::get(bs);
+        log2maxMvLengthHorizontal = ExpGolomb::get(bs);
+        log2maxMvLengthVertical = ExpGolomb::get(bs);
+        numReorderFrames = ExpGolomb::get(bs);
+        maxDecFrameBuffering = ExpGolomb::get(bs);
     }
 
-    void VuiParameters::BitstreamRestriction::write(BitStream *bitWriter) const {
-        bitWriter->set(motionVectorsOverPicBoundariesFlag);
-        ExpGolomb::set(maxBitsPerMbDenom, bitWriter);
-        ExpGolomb::set(maxBitsPerMbDenom, bitWriter);
-        ExpGolomb::set(log2maxMvLengthHorizontal, bitWriter);
-        ExpGolomb::set(log2maxMvLengthVertical, bitWriter);
-        ExpGolomb::set(numReorderFrames, bitWriter);
-        ExpGolomb::set(maxDecFrameBuffering, bitWriter);
+    void VuiParameters::BitstreamRestriction::write(BitStream &bs) const {
+        bs.set(motionVectorsOverPicBoundariesFlag);
+        ExpGolomb::set(maxBitsPerMbDenom, bs);
+        ExpGolomb::set(maxBitsPerMbDenom, bs);
+        ExpGolomb::set(log2maxMvLengthHorizontal, bs);
+        ExpGolomb::set(log2maxMvLengthVertical, bs);
+        ExpGolomb::set(numReorderFrames, bs);
+        ExpGolomb::set(maxDecFrameBuffering, bs);
     }
 
-    VuiParameters::VuiParameters(BitStream *br) {
+    VuiParameters::VuiParameters(BitStream &bs) {
         //aspect_ratio_info_present_flag
-        if (br->get()) {
-            auto aspectRatioIdc = br->get<uint8_t>(8);
+        if (bs.get()) {
+            auto aspectRatioIdc = bs.get<uint8_t>(8);
             aspectRatio.reset(
-                    aspectRatioIdc == EXTENDED_SAR ? new AspectRatioExt(aspectRatioIdc, br)
+                    aspectRatioIdc == EXTENDED_SAR ? new AspectRatioExt(aspectRatioIdc, bs)
                                                    : new AspectRatio(aspectRatioIdc));
         } else {
             aspectRatio = nullptr;
         }
-        overscanInfoPresentFlag = br->get();
+        overscanInfoPresentFlag = bs.get();
         if (overscanInfoPresentFlag) {
-            overscanAppropriateFlag = br->get();
+            overscanAppropriateFlag = bs.get();
         } else {
             overscanAppropriateFlag = false;
         }
         //video_signal_type_present_flag
-        videoSignalType.reset(br->get() ? new VideoSignalType(br) : nullptr);
+        videoSignalType.reset(bs.get() ? new VideoSignalType(bs) : nullptr);
         //chroma_loc_info_present_flag
-        chromaLoc.reset(br->get() ? new ChromaLoc(br) : nullptr);
+        chromaLoc.reset(bs.get() ? new ChromaLoc(bs) : nullptr);
         //timing_info_present_flag
-        timing.reset(br->get() ? new Timing(br) : nullptr);
+        timing.reset(bs.get() ? new Timing(bs) : nullptr);
         //nal_hrd_parameters_present_flag
-        nalHrdParameters.reset(br->get() ? new HrdParameters(br) : nullptr);
+        nalHrdParameters.reset(bs.get() ? new HrdParameters(bs) : nullptr);
         //vcl_hrd_parameters_present_flag
-        vclHrdParameters.reset(br->get() ? new HrdParameters(br) : nullptr);
-        lowDelayHrdFlag = (nalHrdParameters || vclHrdParameters) && br->get();
+        vclHrdParameters.reset(bs.get() ? new HrdParameters(bs) : nullptr);
+        lowDelayHrdFlag = (nalHrdParameters || vclHrdParameters) && bs.get();
 
-        picStructPresentFlag = br->get();
+        picStructPresentFlag = bs.get();
         //bitstream_restriction_flag
-        bitstreamRestriction.reset(br->get() ? new BitstreamRestriction(br) : nullptr);
+        bitstreamRestriction.reset(bs.get() ? new BitstreamRestriction(bs) : nullptr);
     }
 
     bool VuiParameters::getOverscanAppropriateFlag() const {
@@ -172,21 +172,21 @@ namespace h26x {
     void VuiParameters::clearOverscanAppropriateFlag() {
         overscanAppropriateFlag = overscanInfoPresentFlag = false;
     }
-    void VuiParameters::write(BitStream *bitWriter) const {
-        Writable::setFlagAndWrite(bitWriter, aspectRatio.get());
-        bitWriter->set(overscanInfoPresentFlag);
+    void VuiParameters::write(BitStream &bs) const {
+        Writable::setFlagAndWrite(bs, aspectRatio.get());
+        bs.set(overscanInfoPresentFlag);
         if (overscanInfoPresentFlag) {
-            bitWriter->set(overscanAppropriateFlag);
+            bs.set(overscanAppropriateFlag);
         }
-        Writable::setFlagAndWrite(bitWriter, videoSignalType.get());
-        Writable::setFlagAndWrite(bitWriter, chromaLoc.get());
-        Writable::setFlagAndWrite(bitWriter, timing.get());
-        Writable::setFlagAndWrite(bitWriter, nalHrdParameters.get());
-        Writable::setFlagAndWrite(bitWriter, vclHrdParameters.get());
+        Writable::setFlagAndWrite(bs, videoSignalType.get());
+        Writable::setFlagAndWrite(bs, chromaLoc.get());
+        Writable::setFlagAndWrite(bs, timing.get());
+        Writable::setFlagAndWrite(bs, nalHrdParameters.get());
+        Writable::setFlagAndWrite(bs, vclHrdParameters.get());
         if (nalHrdParameters || vclHrdParameters) {
-            bitWriter->set(lowDelayHrdFlag);
+            bs.set(lowDelayHrdFlag);
         }
-        bitWriter->set(picStructPresentFlag);
-        Writable::setFlagAndWrite(bitWriter, bitstreamRestriction.get());
+        bs.set(picStructPresentFlag);
+        Writable::setFlagAndWrite(bs, bitstreamRestriction.get());
     }
 }

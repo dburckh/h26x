@@ -29,7 +29,7 @@ namespace h26x {
         bool deblocking_filter_control_present_flag = false;
         bool constrained_intra_pred_flag = false;
         bool redundant_pic_cnt_present_flag = false;
-        void read(BitStream * bitStream);
+        bool read(BitStream &bs);
     };
 
 } // h26x

@@ -29,8 +29,8 @@ namespace h26x {
          * We will advance to the start of read NAL Unit or end of buffer
          * @return nullptr if not found
          */
-        NalUnit * findNalUnit();
-        NalUnit * findNalUnit4();
+        std::unique_ptr<NalUnit> findNalUnit();
+        std::unique_ptr<NalUnit> findNalUnit4();
         /**
          * Points to 0x[00] 00 00 01
          * @return prefix pointer or nullptr
@@ -45,10 +45,10 @@ namespace h26x {
         /**
          * @return true if we have reached the end of the buffer
          */
-        bool isEnd() const;
+        [[nodiscard]] bool isEnd() const;
     private:
         bool findPrefix(const KMPSearch& search);
-        NalUnit * findNalUnit(const KMPSearch& search);
+        std::unique_ptr<NalUnit> findNalUnit(const KMPSearch& search);
         bool isNalType();
         const static uint8_t NAL_HEADER3[3];
         const static uint8_t NAL_HEADER4[4];

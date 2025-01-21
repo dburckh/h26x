@@ -95,10 +95,10 @@ TEST(bitstreamTest, exp_golomb_k0)
     BufferStream bs(data, sizeof(data));
     BitStream br(&bs);
 
-    EXPECT_EQ(0, ExpGolomb::get(&br));
-    EXPECT_EQ(1, ExpGolomb::get(&br));
-    EXPECT_EQ(2, ExpGolomb::get(&br));
-    EXPECT_EQ(3, ExpGolomb::get(&br));
+    EXPECT_EQ(0, ExpGolomb::get(br));
+    EXPECT_EQ(1, ExpGolomb::get(br));
+    EXPECT_EQ(2, ExpGolomb::get(br));
+    EXPECT_EQ(3, ExpGolomb::get(br));
 }
 //------------------------------------------------------------------------------
 TEST(bitstreamTest, exp_golomb_signed)
@@ -107,8 +107,8 @@ TEST(bitstreamTest, exp_golomb_signed)
     BufferStream bs(data, sizeof(data));
     BitStream br(&bs);
 
-    EXPECT_EQ(-3, ExpGolomb::getSigned(&br));
-    EXPECT_EQ(1, ExpGolomb::getSigned(&br));
+    EXPECT_EQ(-3, ExpGolomb::getSigned(br));
+    EXPECT_EQ(1, ExpGolomb::getSigned(br));
 }
 //------------------------------------------------------------------------------
 TEST(bitstreamTest, overread)

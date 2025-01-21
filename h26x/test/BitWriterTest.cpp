@@ -132,14 +132,14 @@ TEST(bitwriterTest, SetExpGolomb)
     std::vector<uint8_t> buffer(3);
     BufferStream rwbs(buffer.data(), buffer.capacity());
     BitStream w(&rwbs);
-    ExpGolomb::set(5, &w);
+    ExpGolomb::set(5, w);
     EXPECT_EQ(5, w.position());
-    ExpGolomb::setSigned(-42, &w);
+    ExpGolomb::setSigned(-42, w);
     EXPECT_TRUE(w.isOk());
     w.flush();
 
     BufferStream robs(buffer.data(), buffer.capacity());
     BitStream r(&robs);
-    EXPECT_EQ(5, ExpGolomb::get(&r));
-    EXPECT_EQ(-42, ExpGolomb::getSigned(&r));
+    EXPECT_EQ(5, ExpGolomb::get(r));
+    EXPECT_EQ(-42, ExpGolomb::getSigned(r));
 }

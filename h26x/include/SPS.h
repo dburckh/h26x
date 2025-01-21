@@ -30,8 +30,8 @@ namespace h26x {
         class ProfileIdcInfoExt: public ProfileIdcInfo, Writable {
         public:
             ProfileIdcInfoExt() = default;
-            bool read(BitStream *br);
-            void write(BitStream *bitWriter) const override;
+            bool read(BitStream &bs);
+            void write(BitStream &bs) const override;
             /**
              * Only for chromaFormatIdc == CHROMA_FORMAT_IDC_444
              */
@@ -41,21 +41,21 @@ namespace h26x {
             bool qpprimeYzeroTransformBypassFlag {false};
             std::vector< std::vector <int > > seqScalingMatrix;
         private:
-            static std::vector<int> readScaleList(BitStream *bitstream, int size);
+            static std::vector<int> readScaleList(BitStream &bs, int size);
         };
 
         class PicOrderCountType:Writable {
         public:
             explicit PicOrderCountType(uint8_t type);
-            void write(BitStream *bitWriter) const override;
+            void write(BitStream &bs) const override;
             const uint8_t type;
             virtual ~PicOrderCountType() = default;
         };
 
         class PicOrderCountType0:public PicOrderCountType {
         public:
-            explicit PicOrderCountType0(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit PicOrderCountType0(BitStream &bs);
+            void write(BitStream &bs) const override;
             /**
              * [0-12]
              */
@@ -64,8 +64,8 @@ namespace h26x {
 
         class PicOrderCountType1:public PicOrderCountType {
         public:
-            explicit PicOrderCountType1(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit PicOrderCountType1(BitStream &bs);
+            void write(BitStream &bs) const override;
             bool deltaPicOrderAlwaysZeroFlag;
             int32_t offsetForNonRefPic;
             int32_t offsetForTopToBottomField;
@@ -75,16 +75,16 @@ namespace h26x {
 
         class FrameCropOffset:public Writable {
         public:
-            explicit FrameCropOffset(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit FrameCropOffset(BitStream &bs);
+            void write(BitStream &bs) const override;
             uint32_t left;
             uint32_t right;
             uint32_t top;
             uint32_t bottom;
         };
 
-        bool read(BitStream * br);
-        void write(BitStream *bitWriter) const override;
+        bool read(BitStream &bs);
+        void write(BitStream &bs) const override;
 
         [[nodiscard]] PicOrderCountType0 * getPicOrderCountType0() const;
         [[nodiscard]] PicOrderCountType1 * getPicOrderCountType1() const;

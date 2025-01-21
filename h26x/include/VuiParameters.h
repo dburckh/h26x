@@ -16,22 +16,22 @@ namespace h26x {
         class AspectRatio:public Writable {
         public:
             explicit AspectRatio(uint8_t aspectRatioIdc);
-            void write(BitStream *bitWriter) const override;
+            void write(BitStream &bs) const override;
 
             uint8_t aspectRationIdc;
         };
         class AspectRatioExt:public AspectRatio {
         public:
-            explicit AspectRatioExt(uint8_t aspectRatioIdc, BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit AspectRatioExt(uint8_t aspectRatioIdc, BitStream &bs);
+            void write(BitStream &bs) const override;
 
             uint16_t sarWidth;
             uint16_t sarHeight;
         };
         class ColourDescription:public Writable {
         public:
-            explicit ColourDescription(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit ColourDescription(BitStream &bs);
+            void write(BitStream &bs) const override;
 
             uint8_t colourPrimaries;
             uint8_t transferCharacteristics;
@@ -39,8 +39,8 @@ namespace h26x {
         };
         class VideoSignalType:public Writable {
         public:
-            explicit VideoSignalType(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit VideoSignalType(BitStream &bs);
+            void write(BitStream &bs) const override;
 
             uint8_t videoFormat;
             bool videoFullRange;
@@ -49,8 +49,8 @@ namespace h26x {
         };
         class ChromaLoc:public Writable {
         public:
-            explicit ChromaLoc(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit ChromaLoc(BitStream &bs);
+            void write(BitStream &bs) const override;
 
             /**
              * [0-5]
@@ -63,8 +63,8 @@ namespace h26x {
         };
         class Timing:public Writable {
         public:
-            explicit Timing(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit Timing(BitStream &bs);
+            void write(BitStream &bs) const override;
 
             uint32_t numUnitsInTick;
             uint32_t timeScale;
@@ -77,8 +77,8 @@ namespace h26x {
         };
         class HrdParameters:public Writable {
         public:
-            explicit HrdParameters(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit HrdParameters(BitStream &bs);
+            void write(BitStream &bs) const override;
 
             uint8_t bitRateScale; // u(4)
             uint8_t cpbSizeScale; // u(4)
@@ -90,8 +90,8 @@ namespace h26x {
         };
         class BitstreamRestriction:public Writable {
         public:
-            explicit BitstreamRestriction(BitStream *bitstream);
-            void write(BitStream *bitWriter) const override;
+            explicit BitstreamRestriction(BitStream &bs);
+            void write(BitStream &bs) const override;
 
             bool motionVectorsOverPicBoundariesFlag;
             /**
@@ -114,8 +114,8 @@ namespace h26x {
             uint16_t maxDecFrameBuffering;
         };
     public:
-        explicit VuiParameters(BitStream *bitstream);
-        void write(BitStream *bitWriter) const override;
+        explicit VuiParameters(BitStream &bs);
+        void write(BitStream &bs) const override;
 
         std::unique_ptr<AspectRatio> aspectRatio;
         bool overscanInfoPresentFlag;
@@ -127,7 +127,7 @@ namespace h26x {
         bool lowDelayHrdFlag; // Only valid if nalHrdParameters || vclHrdParameters
         bool picStructPresentFlag;
         std::unique_ptr<BitstreamRestriction> bitstreamRestriction;
-        bool getOverscanAppropriateFlag() const;
+        [[nodiscard]] bool getOverscanAppropriateFlag() const;
         void setOverscanAppropriateFlag(bool v);
         void clearOverscanAppropriateFlag();
 

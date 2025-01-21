@@ -35,7 +35,7 @@ namespace h26x {
 
     class SliceHeader {
     public:
-        bool read(NalUnit * nalUnit, SPS * sps, PPS * pps);
+        bool read(NalUnit const &nalUnit, SPS const &sps, PPS const &pps);
         bool isPSlice() const;
         bool isBSlice() const;
         bool isSPSlice() const;
@@ -88,18 +88,18 @@ namespace h26x {
 
     private:
         static bool parseRefPicListModification(
-                BitStream * br,
+                BitStream &bs,
                 uint32_t num_ref_idx_active_minus1,
                 std::vector<H264ModificationOfPicNum> *ref_list_mods);
         bool parseWeightingFactors(
-                BitStream * br,
+                BitStream &bs,
                 uint32_t num_ref_idx_active_minus1,
                 uint8_t chroma_array_type,
                 H264WeightingFactors* w_facts);
-        bool parseRefPicListModifications(BitStream * br);
-        bool parsePredWeightTable(BitStream * br, SPS * sps);
+        bool parseRefPicListModifications(BitStream &bs);
+        bool parsePredWeightTable(BitStream &bs, SPS const &sps);
 
-        bool parseDecRefPicMarking(BitStream *br, bool idr);
+        bool parseDecRefPicMarking(BitStream &bs, bool idr);
     };
 
 } // h26x
