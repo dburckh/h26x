@@ -19,4 +19,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "H26x Utils"
+rootProject.name = "h26x"
