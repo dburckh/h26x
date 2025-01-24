@@ -18,6 +18,7 @@ namespace h26x {
          * @return true if a byte was written (not at end of buffer)
          */
         virtual bool write(uint8_t byte) = 0;
+        virtual bool isWrite() const = 0;
     };
 
 } // h26x

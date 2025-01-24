@@ -40,7 +40,7 @@ namespace h26x {
             }
         }
     }
-    const uint8_t * KMPSearch::find(const uint8_t* haystack, int haystackLen) const {
+    const uint8_t * KMPSearch::find(const uint8_t* const haystack, int haystackLen) const {
         int i = 0; // index for needle[]
         int j = 0; // index for haystack[]
         while ((haystackLen - i) >= (needleLen - j)) {

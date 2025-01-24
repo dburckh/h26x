@@ -20,10 +20,6 @@ namespace h26x {
         return getH264Type(mpBuffer[mNalTypeOffset]);
     }
 
-    const uint8_t *NalUnit::getNalTypePointer() const {
-        return mpBuffer + mNalTypeOffset;
-    }
-
     uint8_t NalUnit::getH265Type() const {
         return getH265Type(mpBuffer[mNalTypeOffset]);;
     }
@@ -31,22 +27,24 @@ namespace h26x {
     size_t NalUnit::getSize() const {
         return mSize;
     }
+    size_t NalUnit::getPrefixSize() const {
+        return mNalTypeOffset + 1;
+    }
 
-    const uint8_t *NalUnit::getNalUnitPointer() const {
-        return mpBuffer + mNalTypeOffset + 1;
+    const uint8_t *NalUnit::getPrefixPtr() const {
+        return mpBuffer;
+    }
+
+    const uint8_t *NalUnit::getNalUnitPtr() const {
+        return mpBuffer + getPrefixSize();
     }
 
     size_t NalUnit::getNalUnitSize() const {
-        return mSize - mNalTypeOffset - 1;
+        return mSize - getPrefixSize();
     }
 
     uint8_t NalUnit::getNalRefIdc() const {
         // H264
         return (mpBuffer[mNalTypeOffset] & 0x60) >> 5;
     }
-
-    BufferStream NalUnit::getPayload() const {
-        return {getNalUnitPointer(), getNalUnitSize()};
-    }
-
 } // h26x

@@ -17,13 +17,13 @@ namespace h26x {
         size_t skip(size_t s) override;
         bool read(uint8_t *byte) const override;
         bool write(uint8_t bytes) override;
+        bool isWrite() const override;
 
     private:
+        const bool mWrite;
         const size_t mSize;
         size_t mPosition {0};
         const uint8_t *mpBuffer;
-        uint8_t * mpRWBuffer;
-
     };
 
 } // h26x

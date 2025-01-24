@@ -210,8 +210,8 @@ namespace h26x {
             // "Interlaced streams not supported"
             return false;
         }
-        BufferStream bufferStream(nalUnit.getNalUnitPointer(), nalUnit.getNalUnitSize());
-        BitStream bs(&bufferStream);
+        BufferStream bufferStream(nalUnit.getNalUnitPtr(), nalUnit.getNalUnitSize());
+        BitStream bs(bufferStream);
         first_mb_in_slice = ExpGolomb::get(bs);
         slice_type = ExpGolomb::get(bs);
         if (slice_type >= 10) {

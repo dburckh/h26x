@@ -32,17 +32,17 @@ TEST(pictureCounterTest, fromStream) {
     {
         auto nalUnit = finder.findNalUnit4();
         EXPECT_EQ(NAL_TYPE_SPS, nalUnit->getH264Type());
-        auto payload = nalUnit->getPayload();
-        auto bufferStream = NalByteStream(&payload);
-        auto bitStream = BitStream(&bufferStream);
+        BufferStream bufferStream(nalUnit->getNalUnitPtr(), nalUnit->getNalUnitSize());
+        NalByteStream nalByteStream(bufferStream);
+        BitStream bitStream(nalByteStream);
         EXPECT_TRUE(sps->read(bitStream));
     }
     {
         auto nalUnit = finder.findNalUnit4();
         EXPECT_EQ(NAL_TYPE_PPS, nalUnit->getH264Type());
-        auto payload = nalUnit->getPayload();
-        auto bufferStream = NalByteStream(&payload);
-        auto bitStream = BitStream(&bufferStream);
+        BufferStream bufferStream(nalUnit->getNalUnitPtr(), nalUnit->getNalUnitSize());
+        NalByteStream nalByteStream(bufferStream);
+        auto bitStream = BitStream(nalByteStream);
         EXPECT_TRUE(pps->read(bitStream));
     }
     {

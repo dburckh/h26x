@@ -6,7 +6,7 @@
 #include <algorithm>
 
 namespace h26x {
-    BitStream::BitStream(ByteStream *byteStream):mByteStream(byteStream) {
+    BitStream::BitStream(ByteStream &byteStream):mByteStream(byteStream) {
         mBitsRemaining = setWork() ? 8 : 0;
     }
 
@@ -65,19 +65,19 @@ namespace h26x {
     }
 
     bool BitStream::setWork() {
-        return mByteStream->read(&mWork);
+        return mByteStream.read(&mWork);
     }
 
     void BitStream::advanceBuffer() {
         flush();
-        mBitsRemaining = mByteStream->skip(1) && setWork() ? 8 : 0;
+        mBitsRemaining = mByteStream.skip(1) && setWork() ? 8 : 0;
     }
 
     size_t BitStream::available() const {
         if (mBitsRemaining) {
-            return (mByteStream->available() - 1) * 8 + mBitsRemaining;
+            return (mByteStream.available() - 1) * 8 + mBitsRemaining;
         } else {
-            return mByteStream->available() * 8;
+            return mByteStream.available() * 8;
         }
     }
 
@@ -95,7 +95,7 @@ namespace h26x {
         auto toSkip = s;
         toSkip -= mBitsRemaining;
         mBitsRemaining = 0;
-        toSkip -= mByteStream->skip(toSkip / 8) * 8;
+        toSkip -= mByteStream.skip(toSkip / 8) * 8;
         // This should only be >= 8 if we ran into the end of stream
         if (toSkip < 8) {
             advanceBuffer();
@@ -120,9 +120,9 @@ namespace h26x {
 
     size_t BitStream::position() const {
         if (mBitsRemaining) {
-            return (mByteStream->position() + 1) * 8 - mBitsRemaining;
+            return (mByteStream.position() + 1) * 8 - mBitsRemaining;
         } else {
-            return mByteStream->position() * 8;
+            return mByteStream.position() * 8;
         }
     }
 
@@ -184,7 +184,7 @@ namespace h26x {
 
     void BitStream::flush() {
         if (mWrite) {
-            if (mByteStream->write(mWork)) {
+            if (mByteStream.write(mWork)) {
                 mWrite = false;
             }
         }

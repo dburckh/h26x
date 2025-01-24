@@ -14,13 +14,13 @@ TEST(sliceHeaderTest, readNonIdr) {
     const uint8_t ppsData[] = PPS_DATA
 
     BufferStream ppsBs(ppsData, sizeof(ppsData));
-    BitStream ppsBr(&ppsBs);
+    BitStream ppsBr(ppsBs);
     PPS pps;
     pps.read(ppsBr);
 
     const uint8_t spsData[] = SPS_DATA
     BufferStream spsBs(spsData, sizeof(spsData));
-    BitStream spsBr(&spsBs);
+    BitStream spsBr(spsBs);
     SPS sps;
     sps.read(spsBr);
 

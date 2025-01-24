@@ -7,10 +7,10 @@
 
 namespace h26x {
     BufferStream::BufferStream(const uint8_t *pBuffer, size_t size):
-            mpBuffer(pBuffer),mpRWBuffer(nullptr),mSize(size) {
+            mpBuffer(pBuffer),mWrite(false),mSize(size) {
     }
     BufferStream::BufferStream(uint8_t *pBuffer, size_t size):
-            mpBuffer(pBuffer),mpRWBuffer(pBuffer),mSize(size) {
+            mpBuffer(pBuffer),mWrite(true),mSize(size) {
     }
     size_t BufferStream::position() const {
         return mPosition;
@@ -34,10 +34,14 @@ namespace h26x {
         return true;
     }
     bool BufferStream::write(uint8_t byte) {
-        if (mpRWBuffer && mPosition < mSize) {
-            mpRWBuffer[mPosition] = byte;
+        if (mWrite && mPosition < mSize) {
+            const_cast<uint8_t *>(mpBuffer)[mPosition] = byte;
             return true;
         }
         return false;
+    }
+
+    bool BufferStream::isWrite() const {
+        return mWrite;
     }
 } // h26x

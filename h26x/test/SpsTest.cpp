@@ -2,9 +2,9 @@
 // Created by dburc on 11/16/2024.
 //
 #include <gtest/gtest.h>
-#include "../include/ByteStream.h"
-#include "../include/BitStream.h"
-#include "../include/SPS.h"
+#include "BitStream.h"
+#include "SPS.h"
+#include "BufferStream.h"
 #include "Common.h"
 #include "NalByteStream.h"
 
@@ -17,8 +17,8 @@ TEST(spsTest, readSps)
                             0x8D, 0x08, 0x00, 0x00, 0x1F, 0x40, 0x00,
                             0x06, 0x1A, 0x84, 0x78, 0xB1, 0x75};
 
-    BufferStream robs(data, sizeof(data));
-    BitStream br(&robs);
+    BufferStream bufferStream(data, sizeof(data));
+    BitStream br(bufferStream);
     SPS sps;
     sps.read(br);
 
@@ -68,7 +68,7 @@ TEST(spsTest, readSps)
 
     std::vector<uint8_t> buffer(sizeof(data));
     BufferStream rwbs(buffer.data(), buffer.capacity());
-    BitStream bw(&rwbs);
+    BitStream bw(rwbs);
 
     sps.write(bw);
     EXPECT_EQ(br.position(), bw.position());
@@ -87,9 +87,9 @@ TEST(spsTest, readCommonSps)
 
     const uint8_t data[] = SPS_DATA
 
-    BufferStream bs(data, sizeof(data));
-    NalByteStream nbs(&bs);
-    BitStream br(&nbs);
+
+    NalByteStream nbs(*(new BufferStream(data, sizeof(data))));
+    BitStream br(nbs);
     SPS sps;
     sps.read(br);
 
@@ -149,9 +149,9 @@ TEST(spsTest, readCommonSps)
     }
 
     std::vector<uint8_t> buffer(sizeof(data));
-    BufferStream rwbs(buffer.data(), buffer.capacity());
-    NalByteStream rwnbs(&rwbs);
-    BitStream bw(&rwnbs);
+    BufferStream bufferStream(buffer.data(), buffer.capacity());
+    NalByteStream rwnbs(bufferStream);
+    BitStream bw(rwnbs);
 
     sps.write(bw);
     // Writer writes to end of last byte, so we need to round up to nearest byte

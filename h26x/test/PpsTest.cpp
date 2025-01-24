@@ -14,7 +14,7 @@ TEST(ppsTest, readPps) {
     const uint8_t data[] = PPS_DATA
 
     BufferStream bs(data, sizeof(data));
-    BitStream br(&bs);
+    BitStream br(bs);
     PPS pps;
     pps.read(br);
 

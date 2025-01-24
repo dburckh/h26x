@@ -25,10 +25,14 @@
 #define H265_NAL_SPS				33 // Sequence parameter set
 #define H265_NAL_PPS				34 // Picture parameter set
 #include <cstdint>
-#include "BufferStream.h"
 
 namespace h26x {
 
+    /**
+     * NalUnit Buffer wrapper includes:
+     * Prefix [0x000001 | 0x00000001] + NAL Unit Type
+     * NAL Unit - unescaped
+     */
     class NalUnit {
     public:
         NalUnit(const uint8_t * pBuffer, size_t size, uint8_t nalTypeOffset);
@@ -39,12 +43,16 @@ namespace h26x {
         [[nodiscard]] uint8_t getH265Type() const;
 
         [[nodiscard]] size_t getSize() const;
-        [[nodiscard]] const uint8_t * getNalTypePointer() const;
-        [[nodiscard]] BufferStream getPayload() const;
+        [[nodiscard]] size_t getPrefixSize() const;
+
+        /**
+         * Return a pointer to the start of the NAL Unit Prefix
+         */
+        [[nodiscard]] const uint8_t * getPrefixPtr() const;
         /**
          * Return the pointer to start of the NAL Unit payload (after type)
          */
-        [[nodiscard]] const uint8_t * getNalUnitPointer() const;
+        [[nodiscard]] const uint8_t * getNalUnitPtr() const;
         /**
          * Return size the NAL Unit payload (after type)
          */

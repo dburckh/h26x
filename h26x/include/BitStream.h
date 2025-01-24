@@ -11,7 +11,7 @@ namespace h26x {
 
     class BitStream:public Stream {
     public:
-        explicit BitStream(ByteStream * byteStream);
+        explicit BitStream(ByteStream &byteStream);
         bool get();
         template<typename T>
         T get(uint8_t bits);
@@ -39,7 +39,7 @@ namespace h26x {
         [[nodiscard]] bool available(uint8_t bits) const;
 
         bool setWork();
-        ByteStream * mByteStream;
+        ByteStream &mByteStream;
 
         bool mWrite {false};
         bool mOk {true};
