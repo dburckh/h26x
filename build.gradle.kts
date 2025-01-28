@@ -34,6 +34,7 @@ android {
     publishing {
         singleVariant("release")
     }
+    packaging.jniLibs.excludes.add("**.so")
 }
 afterEvaluate {
     publishing {
@@ -42,7 +43,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.homesoft.android"
                 artifactId = "h26x"
-                version = "0.1.0"
+                version = "0.1.2"
             }
         }
     }

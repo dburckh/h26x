@@ -6,45 +6,47 @@
 
 namespace h26x {
     NalUnitFinder::NalUnitFinder(const uint8_t *pBuffer, size_t size) :
-            mpBuffer(pBuffer),
-            mpBufferEnd(pBuffer + size) {
+            mBufferPtr(pBuffer),
+            mBufferEndPtr(pBuffer + size) {
     }
 
-    bool NalUnitFinder::findPrefix() {
+    const uint8_t * NalUnitFinder::findPrefix() {
         return findPrefix(NAL3);
     }
 
-    bool NalUnitFinder::findPrefix4() {
+    const uint8_t * NalUnitFinder::findPrefix4() {
         return findPrefix(NAL4);
     }
 
-    bool NalUnitFinder::findPrefix(const KMPSearch &search) {
-        mpPrefix = search.find(mpBuffer, mpBufferEnd - mpBuffer);
-        if (mpPrefix) {
-            mpBuffer = mpPrefix + search.needleLen;
-            if (search.needleLen == 3 && mpPrefix > mpBuffer && mpPrefix[-1] == 0) {
-                mpPrefix--;
-            }
-            if (isNalType()) {
-                return true;
-            } else {
-                mpPrefix = nullptr;
-            }
-        } else {
-            mpBuffer = mpBufferEnd;
+    const uint8_t * NalUnitFinder::findPrefix(const KMPSearch &search) {
+        if (isEnd()) {
+            return nullptr;
         }
-        return false;
+        const auto startPtr = mPrefixPtr ? mPrefixPtr + search.needleLen : mBufferPtr;
+        mPrefixPtr = search.find(startPtr, mBufferEndPtr - startPtr);
+        if (mPrefixPtr) {
+            if (search.needleLen == 3 && mPrefixPtr != mBufferPtr && mPrefixPtr[-1] == 0) {
+                mPrefixPtr--;
+            }
+            return mPrefixPtr;
+        } else {
+            mPrefixPtr = mBufferEndPtr;
+        }
+        return nullptr;
     }
 
     std::unique_ptr<NalUnit> NalUnitFinder::findNalUnit(const KMPSearch &search) {
-        if (mpPrefix == nullptr) {
+        if (isEnd()) {
+            return nullptr;
+        }
+        if (mPrefixPtr == nullptr) {
             if (!findPrefix(search)) {
                 return nullptr;
             }
         }
-        NalUnitFinder prior = *this;
-        auto pNalEnd = findPrefix(search) ? mpPrefix : mpBufferEnd;
-        return std::make_unique<NalUnit>(prior.mpPrefix, pNalEnd - prior.mpPrefix, search.needleLen);
+        auto startPtr = mPrefixPtr;
+        findPrefix(search);
+        return std::make_unique<NalUnit>(startPtr, mPrefixPtr - startPtr, search.needleLen);
     }
 
     std::unique_ptr<NalUnit> NalUnitFinder::findNalUnit() {
@@ -56,22 +58,29 @@ namespace h26x {
     }
 
     bool NalUnitFinder::isEnd() const {
-        return mpBuffer == mpBufferEnd ;
+        return mPrefixPtr == mBufferEndPtr ;
     }
 
-    bool NalUnitFinder::isNalType() {
-        return (*mpBuffer & 0x80) == 0;
+    const uint8_t *NalUnitFinder::getPrefixPtr() const {
+        return mPrefixPtr;
     }
 
-    const uint8_t *NalUnitFinder::getPrefixPointer() const {
-        return mpPrefix;
-    }
-
-    const uint8_t *NalUnitFinder::getNalUnitTypePointer() const {
-        if (mpPrefix) {
-            return mpBuffer;
+    uint8_t NalUnitFinder::getPrefixSize() const {
+        if (mPrefixPtr) {
+            if (mPrefixPtr[2] == 1) {
+                return 3;
+            } else if (mPrefixPtr[3] == 1) {
+                return 4;
+            }
         }
-        return nullptr;
+        return 0;
+    }
+
+    uint8_t NalUnitFinder::getNalUnitType() {
+        if (mPrefixPtr) {
+            return *(mPrefixPtr + getPrefixSize());
+        }
+        return 0;
     }
 
     const uint8_t NalUnitFinder::NAL_HEADER3[3] = {0,0,1};

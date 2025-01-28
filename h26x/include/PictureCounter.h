@@ -15,16 +15,13 @@ namespace h26x {
 
     class PictureCounter {
     public:
-        explicit PictureCounter(std::shared_ptr<SPS> sps, std::shared_ptr<PPS> pps);
         /**
          *
          * @param pNalType pointer to the NAL Unit Type byte
          * @param size
          * @return picture count
          */
-        int getPictureCount(NalUnit const &nalUnit);
-
-        uint32_t mMaxFrameNum;
+        uint32_t getPictureCount(const NalUnit &nalUnit, const SPS &sps, const PPS &pps);
 
         uint32_t ref_pic_order_cnt_msb_ {0};
         uint32_t ref_pic_order_cnt_lsb_ {0};
@@ -32,9 +29,7 @@ namespace h26x {
         int32_t prev_frame_num_offset_ {0};
         bool pending_mmco5_ {false};
     private:
-        bool hasMMCO5(SliceHeader const &slice_hdr, NalUnit const &nalUnit);
-        std::shared_ptr<SPS> sps;
-        std::shared_ptr<PPS> pps;
+        static bool hasMMCO5(SliceHeader const &slice_hdr, NalUnit const &nalUnit);
     };
 }
 

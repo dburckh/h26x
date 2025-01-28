@@ -24,8 +24,8 @@ TEST(pictureCounterTest, fromStream) {
     std::vector<char> buffer(size);
     EXPECT_TRUE(myfile.read(buffer.data(), size));
 
-    auto sps = std::make_shared<SPS>();
-    auto pps = std::make_shared<PPS>();
+    SPS sps;
+    PPS pps;
 
     NalUnitFinder finder((const uint8_t *)(buffer.data()), size);
 
@@ -35,7 +35,7 @@ TEST(pictureCounterTest, fromStream) {
         BufferStream bufferStream(nalUnit->getNalUnitPtr(), nalUnit->getNalUnitSize());
         NalByteStream nalByteStream(bufferStream);
         BitStream bitStream(nalByteStream);
-        EXPECT_TRUE(sps->read(bitStream));
+        EXPECT_TRUE(sps.read(bitStream));
     }
     {
         auto nalUnit = finder.findNalUnit4();
@@ -43,35 +43,35 @@ TEST(pictureCounterTest, fromStream) {
         BufferStream bufferStream(nalUnit->getNalUnitPtr(), nalUnit->getNalUnitSize());
         NalByteStream nalByteStream(bufferStream);
         auto bitStream = BitStream(nalByteStream);
-        EXPECT_TRUE(pps->read(bitStream));
+        EXPECT_TRUE(pps.read(bitStream));
     }
     {
         auto nalUnit = finder.findNalUnit4();
         EXPECT_EQ(NAL_TYPE_SEI, nalUnit->getH264Type());
     }
-    PictureCounter pictureCounter(sps, pps);
+    PictureCounter pictureCounter;
     {
         auto nalUnit = finder.findNalUnit4();
         EXPECT_EQ(NAL_TYPE_IDR, nalUnit->getH264Type());
 
         SliceHeader sliceHeader;
-        EXPECT_TRUE(sliceHeader.read(*nalUnit, *sps, *pps));
-        EXPECT_EQ(0, pictureCounter.getPictureCount(*nalUnit));
+        EXPECT_TRUE(sliceHeader.read(*nalUnit, sps, pps));
+        EXPECT_EQ(0, pictureCounter.getPictureCount(*nalUnit, sps, pps));
     }
     {
         auto nalUnit = finder.findNalUnit4();
         EXPECT_EQ(NAL_TYPE_NON_IDR, nalUnit->getH264Type());
 
         SliceHeader sliceHeader;
-        EXPECT_TRUE(sliceHeader.read(*nalUnit, *sps, *pps));
-        EXPECT_EQ(12, pictureCounter.getPictureCount(*nalUnit));
+        EXPECT_TRUE(sliceHeader.read(*nalUnit, sps, pps));
+        EXPECT_EQ(12, pictureCounter.getPictureCount(*nalUnit, sps, pps));
     }
     {
         auto nalUnit = finder.findNalUnit4();
         EXPECT_EQ(NAL_TYPE_NON_IDR, nalUnit->getH264Type());
 
         SliceHeader sliceHeader;
-        EXPECT_TRUE(sliceHeader.read(*nalUnit, *sps, *pps));
-        EXPECT_EQ(6, pictureCounter.getPictureCount(*nalUnit));
+        EXPECT_TRUE(sliceHeader.read(*nalUnit, sps, pps));
+        EXPECT_EQ(6, pictureCounter.getPictureCount(*nalUnit, sps, pps));
     }
 }

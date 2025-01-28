@@ -18,20 +18,23 @@ TEST(nalUnitTest, find) {
     NalUnitFinder nuf(data, sizeof(data));
 
     EXPECT_TRUE(nuf.findPrefix4());
-    EXPECT_EQ(data, nuf.getPrefixPointer());
-    EXPECT_EQ(data + 4, nuf.getNalUnitTypePointer());
-    EXPECT_EQ(NAL_TYPE_SPS, NalUnit::getH264Type(*nuf.getNalUnitTypePointer()));
+    EXPECT_EQ(data, nuf.getPrefixPtr());
+    EXPECT_EQ(4, nuf.getPrefixSize());
+    EXPECT_EQ(NAL_TYPE_SPS, NalUnit::getH264Type(nuf.getNalUnitType()));
+
+    // auto nalUnit = nuf.findNalUnit4();
+    // EXPECT_EQ(NAL_TYPE_SPS, nalUnit->getH264Type());
 
     NalUnitFinder lastNuf = nuf;
 
     EXPECT_TRUE(nuf.findPrefix4());
-    EXPECT_EQ(data + 32, nuf.getPrefixPointer());
-    EXPECT_EQ(NAL_TYPE_PPS, NalUnit::getH264Type(*nuf.getNalUnitTypePointer()));
+    EXPECT_EQ(data + 32, nuf.getPrefixPtr());
+    EXPECT_EQ(NAL_TYPE_PPS, NalUnit::getH264Type(nuf.getNalUnitType()));
 
-    EXPECT_EQ(32, nuf.getPrefixPointer() - lastNuf.getPrefixPointer());
+    EXPECT_EQ(32, nuf.getPrefixPtr() - lastNuf.getPrefixPtr());
 
     EXPECT_TRUE(nuf.findPrefix4());
-    EXPECT_EQ(data + 42, nuf.getPrefixPointer());
+    EXPECT_EQ(data + 42, nuf.getPrefixPtr());
 
     EXPECT_FALSE(nuf.findPrefix4());
 }

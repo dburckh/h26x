@@ -89,7 +89,7 @@ namespace h26x {
         [[nodiscard]] PicOrderCountType0 * getPicOrderCountType0() const;
         [[nodiscard]] PicOrderCountType1 * getPicOrderCountType1() const;
 
-        uint8_t getChromaArrayType() const;
+        [[nodiscard]] uint8_t getChromaArrayType() const;
 
         uint8_t profileIdc {0};
         bool constraintSet0Flag {false};

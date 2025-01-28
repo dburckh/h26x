@@ -7,9 +7,6 @@
 #include "include/NalUnitFinder.h"
 
 namespace h26x {
-    PictureCounter::PictureCounter(std::shared_ptr<SPS> sps, std::shared_ptr<PPS> pps): sps(std::move(sps)),pps(std::move(pps)),
-        mMaxFrameNum( 1 << (sps->log2MaxFrameNumMinus4 + 4)) {
-    }
     // Check if a slice includes memory management control operation 5, which
     // results in some |pic_order_cnt| state being cleared.
     bool PictureCounter::hasMMCO5(SliceHeader const &slice_hdr, NalUnit const &nalUnit) {
@@ -34,9 +31,9 @@ namespace h26x {
         return false;
     }
 
-    int PictureCounter::getPictureCount(NalUnit const &nalUnit) {
+    uint32_t PictureCounter::getPictureCount(const NalUnit &nalUnit, const SPS &sps, const PPS &pps) {
         SliceHeader sliceHeader;
-        if (!sliceHeader.read(nalUnit, *sps, *pps)) {
+        if (!sliceHeader.read(nalUnit, sps, pps)) {
             return -1;
         }
         if (sliceHeader.field_pic_flag) {
@@ -48,7 +45,7 @@ namespace h26x {
         uint32_t pic_order_cnt = 0;
         bool mmco5 = hasMMCO5(sliceHeader, nalUnit);
 
-        int32_t max_frame_num = 1 << (sps->log2MaxFrameNumMinus4 + 4);
+        int32_t max_frame_num = 1 << (sps.log2MaxFrameNumMinus4 + 4);
 
         // Based on T-REC-H.264 8.2.1, "Decoding process for picture order
         // count", available from http://www.itu.int/rec/T-REC-H.264.
@@ -58,7 +55,7 @@ namespace h26x {
         //
         // Note: Gaps in frame numbers are ignored. They do not affect POC
         // computation.
-        switch (sps->picOrderCountType->type) {
+        switch (sps.picOrderCountType->type) {
             case 0: {
                 auto prev_pic_order_cnt_msb = ref_pic_order_cnt_msb_;
                 auto prev_pic_order_cnt_lsb = ref_pic_order_cnt_lsb_;
@@ -73,7 +70,7 @@ namespace h26x {
                 //      detected when |pic_order_cnt_lsb| increases or decreases by at
                 //      least half of its maximum.
                 uint32_t pic_order_cnt_msb;
-                auto picOrderCountType0 = sps->getPicOrderCountType0();
+                auto picOrderCountType0 = sps.getPicOrderCountType0();
                 uint32_t max_pic_order_cnt_lsb =
                         1 << (picOrderCountType0->log2MaxPicOrderCntLsbMinus4 + 4);
                 if ((sliceHeader.pic_order_cnt_lsb < prev_pic_order_cnt_lsb) &&
@@ -131,7 +128,7 @@ namespace h26x {
 
                 // 8-7. Derive |abs_frame_num|.
                 int32_t abs_frame_num;
-                auto picOrderCountType1 = sps->getPicOrderCountType1();
+                auto picOrderCountType1 = sps.getPicOrderCountType1();
                 auto num_ref_frames_in_pic_order_cnt_cycle = (int32_t)picOrderCountType1->offsetForRefFrame.size();
                 if (num_ref_frames_in_pic_order_cnt_cycle != 0)
                     abs_frame_num = frame_num_offset + sliceHeader.frame_num;
